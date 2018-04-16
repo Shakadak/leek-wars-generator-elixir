@@ -14,13 +14,20 @@ defmodule LeekWarsFightGenerator.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      applications: [
+        :cowboy,
+        :plug,
+      ],
+      extra_applications: [:logger],
+      mod: {LeekWarsGenerator, []},
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:cowboy, "~> 1.1"},
+      {:plug, "~> 1.5"},
       {:poison, "~> 3.1"},
     ]
   end

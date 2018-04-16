@@ -1,18 +1,14 @@
-defmodule LeekWarsFightGenerator do
+defmodule LeekWarsGenerator do
   @moduledoc """
-  Documentation for LeekWarsFightGenerator.
+  Documentation for LeekWarsGenerator.
   """
 
-  @doc """
-  Hello world.
+  def start(_, _) do
+    children = [
+      Plug.Adapters.Cowboy.child_spec(scheme: :http, plug: LeekWarsGenerator.Api.Router, options: [port: 4001]),
+    ]
 
-  ## Examples
-
-      iex> LeekWarsFightGenerator.hello
-      :world
-
-  """
-  def hello do
-    :world
+    opts = [strategy: :one_for_one, name: LeekWarsGenerator.Supervisor]
+    Supervisor.start_link(children, opts)
   end
 end
