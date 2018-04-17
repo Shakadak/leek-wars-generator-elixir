@@ -1,0 +1,24 @@
+defmodule Entity do
+  defstruct [
+    id: nil,
+    level: 0,
+    mp: 0,
+    tp: 0,
+    strength: 0,
+    magic: 0,
+    wisdom: 0,
+    resistance: 0,
+    science: 0,
+    malice: 0,
+    agility: 0,
+    max_life: 0,
+    life: 0,
+    alive?: false,
+    items: [],
+  ]
+
+  def refresh_cooldowns(items) do
+    items
+    |> Enum.map(&Map.update(&1, :current_cooldown, 0, fn x -> max(0, x - 1) end))
+  end
+end

@@ -30,7 +30,7 @@ defmodule Grid do
     grid
   end
 
-  def place_participants(grid, _participants) do
+  def place_participants(_grid, _participants) do
     %{}
   end
 end
