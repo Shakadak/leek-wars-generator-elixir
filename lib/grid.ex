@@ -1,6 +1,10 @@
 defmodule Grid do
   @moduledoc """
+
   Grid creation
+
+
+  :rand.seed(:exsplus, seed)
   """
 
   def disk(radius) do
@@ -14,8 +18,7 @@ defmodule Grid do
     |> Enum.filter(fn {x, y} -> (abs(x) + abs (y)) <= radius end)
   end
 
-  def generate_count(seed, grid, count) do
-    :rand.seed(:exsplus, seed)
+  def generate_count(grid, count) do
     grid
     |> Map.keys()
     |> Enum.take_random(count)
@@ -23,11 +26,11 @@ defmodule Grid do
     |> Enum.into(grid)
   end
 
-  def generate_density({seed, {_width, _height}}, _density) do
-    {seed, %{}}
+  def generate_density(grid, _density) do
+    grid
   end
 
-  def place_participants({seed, _grid}, _participants) do
-    {seed, %{}}
+  def place_participants(grid, _participants) do
+    %{}
   end
 end
