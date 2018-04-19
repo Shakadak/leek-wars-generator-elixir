@@ -7,6 +7,10 @@ defmodule Grid do
   :rand.seed(:exsplus, seed)
   """
 
+  @type grid :: %{{integer, integer} => :empty | :obstacle | :occupied}
+  @type coordinates :: {integer, integer}
+
+  @spec disk(pos_integer) :: grid
   def disk(radius) do
     mkPair = fn x -> fn y -> {x, y} end end
     xs = -radius..radius
@@ -20,6 +24,7 @@ defmodule Grid do
     |> Enum.into(%{})
   end
 
+  @spec generate_count(grid, non_neg_integer) :: grid
   def generate_count(grid, count) do
     grid
     |> Map.keys()
@@ -36,6 +41,7 @@ defmodule Grid do
     %{}
   end
 
+  @spec get_adjacent_cells(coordinates, grid) :: grid
   def get_adjacent_cells({x, y}, grid) do
     grid
     |> Map.take([
@@ -46,7 +52,8 @@ defmodule Grid do
     ])
   end
 
-  def empty_area(starting_cell, grid) do
+  @spec emtpty_area(coordinates, grid) :: grid
+  def empty_grid(starting_cell, grid) do
     explored_cells =
       starting_cell
       |> get_adjacent_cells(grid)
@@ -60,7 +67,8 @@ defmodule Grid do
     |> Enum.reduce(current_area, &Enum.into/2)
   end
 
-  def empty_areas(grid) do
+  @spec empty_grids(grid) :: [grid]
+  def empty_grids(grid) do
     empty_cells =
       grid
       |> Enum.filter(&empty?/1)
@@ -69,9 +77,9 @@ defmodule Grid do
     if empty_cells == [] do
       []
     else
-      empty_area = empty_area(Enum.random(empty_cells), grid)
-      {_, unexplored_area} = Map.split(grid, Map.keys(empty_area))
-      [empty_area | empty_areas(unexplored_area)]
+      empty_grid = empty_grid(Enum.random(empty_cells), grid)
+      {_, unexplored_area} = Map.split(grid, Map.keys(empty_grid))
+      [empty_grid | empty_grids(unexplored_area)]
     end
   end
 
