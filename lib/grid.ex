@@ -16,6 +16,8 @@ defmodule Grid do
     |> Enum.map(mkPair)
     |> Enum.flat_map(&Enum.map(ys, &1))
     |> Enum.filter(fn {x, y} -> (abs(x) + abs (y)) <= radius end)
+    |> Enum.map(&{&1, :empty})
+    |> Enum.into(%{})
   end
 
   def generate_count(grid, count) do
@@ -48,8 +50,8 @@ defmodule Grid do
     explored_cells =
       starting_cell
       |> get_adjacent_cells(grid)
-      |> Enum.filter(fn {_, x} -> x == :empty end)
-      |> Enum.map(fn {x, _} -> x end)
+      |> Enum.filter(&empty?/1)
+      |> Enum.map(&fst/1)
 
     {current_area, unexplored_area} = Map.split(grid, [starting_cell, explored_cells])
 
@@ -58,7 +60,23 @@ defmodule Grid do
     |> Enum.reduce(current_area, &Enum.into/2)
   end
 
-  def empty_areas(_grid) do
-    []
+  def empty_areas(grid) do
+    empty_cells =
+      grid
+      |> Enum.filter(&empty?/1)
+      |> Enum.map(&fst/1)
+
+    if empty_cells == [] do
+      []
+    else
+      empty_area = empty_area(Enum.random(empty_cells), grid)
+      {_, unexplored_area} = Map.split(grid, Map.keys(empty_area))
+      [empty_area | empty_areas(unexplored_area)]
+    end
   end
+
+  def empty?({_, :empty}) do true end
+  def empty?({_, _}) do false end
+
+  defp fst({x, _}) do x end
 end
