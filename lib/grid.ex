@@ -18,9 +18,9 @@ defmodule Grid do
 
     xs
     |> Enum.map(mkPair)
-    |> Enum.flat_map(&Enum.map(ys, &1))
+    |> Enum.flat_map(fn f -> Enum.map(ys, f) end)
     |> Enum.filter(fn {x, y} -> (abs(x) + abs (y)) <= radius end)
-    |> Enum.map(&{&1, :empty})
+    |> Enum.map(fn x -> {x, :empty} end)
     |> Enum.into(%{})
   end
 
@@ -29,7 +29,7 @@ defmodule Grid do
     grid
     |> Map.keys()
     |> Enum.take_random(count)
-    |> Enum.map(&{&1, :obstacle})
+    |> Enum.map(fn x -> {x, :obstacle} end)
     |> Enum.into(grid)
   end
 
@@ -63,7 +63,7 @@ defmodule Grid do
     {current_area, unexplored_area} = Map.split(grid, [starting_cell, explored_cells])
 
     explored_cells
-    |> Enum.map(&empty_area(&1, unexplored_area))
+    |> Enum.map(fn x -> empty_area(x, unexplored_area) end)
     |> Enum.reduce(current_area, &Enum.into/2)
   end
 
