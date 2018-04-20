@@ -52,7 +52,7 @@ defmodule Grid do
     ])
   end
 
-  @spec emtpty_area(coordinates, grid) :: grid
+  @spec empty_grid(coordinates, grid) :: grid
   def empty_grid(starting_cell, grid) do
     explored_cells =
       starting_cell
@@ -63,7 +63,7 @@ defmodule Grid do
     {current_area, unexplored_area} = Map.split(grid, [starting_cell, explored_cells])
 
     explored_cells
-    |> Enum.map(fn x -> empty_area(x, unexplored_area) end)
+    |> Enum.map(fn x -> empty_grid(x, unexplored_area) end)
     |> Enum.reduce(current_area, &Enum.into/2)
   end
 
