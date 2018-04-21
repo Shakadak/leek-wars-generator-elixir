@@ -32,17 +32,22 @@ defmodule Grid do
     end
 
     average_dim = Enum.sum(dimensions) / Enum.count(dimensions)
+    max_tries = 500
 
     placement =
       fn ->
         generate_individual(teams, placement_grid)
       end
       |> Stream.repeatedly()
-      |> Enum.reduce_while(nil, fn x, _ ->
+      |> Enum.reduce_while({max_tries, average_dim}, fn x, {tries, average_dim} ->
         if evaluate_fitness(x) >= average_dim do
           {:halt, x}
         else
-          {:cont, nil}
+          if tries == 0 do
+            {:cont, {max_tries, average_dim - 1}}
+          else
+            {:cont, {tries - 1, average_dim}}
+          end
         end
       end)
 
