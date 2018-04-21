@@ -200,9 +200,8 @@ defmodule Grid do
           :obstacle -> "▓▓"
           :occupied -> "[]"
         end
-        |> IO.write()
       end
-      IO.write("\n")
+      |> IO.puts()
     end
   end
 end
