@@ -52,17 +52,22 @@ defmodule Grid do
 
   @spec empty_grid(coordinates, grid) :: grid
   def empty_grid(starting_cell, grid) do
-    explored_cells =
-      starting_cell
-      |> get_adjacent_cells(grid)
+    empty_grid_go([starting_cell], grid, %{})
+  end
+
+  defp empty_grid_go([], _, acc) do
+    acc
+  end
+  defp empty_grid_go(starting_cells, grid, acc) do
+    {current_area, grid} = Map.split(grid, starting_cells)
+    wave =
+      starting_cells
+      |> Enum.flat_map(fn x -> get_adjacent_cells(x, grid) end)
       |> Enum.filter(&empty?/1)
       |> Enum.map(&fst/1)
+      |> Enum.uniq()
 
-    {current_area, unexplored_area} = Map.split(grid, [starting_cell, explored_cells])
-
-    explored_cells
-    |> Enum.map(fn x -> empty_grid(x, unexplored_area) end)
-    |> Enum.reduce(current_area, &Enum.into/2)
+    empty_grid_go(wave, grid, Map.merge(current_area, acc))
   end
 
   @spec empty_grids(grid) :: [grid]
@@ -85,29 +90,52 @@ defmodule Grid do
   def empty?({_, _}) do false end
 
   defp fst({x, _}) do x end
+  defp snd({_, x}) do x end
 
-  defp liftA2(f, xs, ys) do
+  defp liftA2(f, xs, ys) when is_function(f, 2) do
     for x <- xs, y <- ys do f.(x, y) end
   end
 
-  defp manhattan(x, y) do
-    [x, y]
-    |> Enum.map(&Tuple.to_list/1)
-    |> Enum.zip()
-    |> Enum.map(fn {p, q} -> abs(p - q) end)
-    |> Enum.sum()
+  defp split_random_n(map, n) do
+    keys =
+      map
+      |> Map.keys()
+      |> Enum.take_random(n)
+
+    Map.split(map, keys)
   end
 
-  #defp evaluate_fitness(teams) do
-  #  teams
-  #  |> Enum.flat_map(fn {team, members} ->
-  #    other_teams = Map.delete(teams, team)
-  #    other_members = Enum.flat_map(other_teams, fn {_, xs} -> xs end)
-  #    members
-  #    |> Enum.flat_map(fn x ->
-  #end
+  defp manhattan({x, y}, {p, q}) do
+    abs(x - p) + abs(y - q)
+  end
 
-  defp _ do
-    0
+  # GENETIC ALGO
+
+  def evaluate_fitness(teams) do
+    teams
+    |> Enum.flat_map(fn {team, positions} ->
+      other_positions =
+        teams
+        |> Map.delete(team)
+        |> Enum.flat_map(&snd/1)
+      liftA2(&manhattan/2, positions, other_positions)
+    end)
+    |> Enum.min()
+  end
+
+  def generate_individual(teams, grid) do
+    {teams, _} = Enum.reduce(teams, {%{}, grid}, fn {team, nb_members}, {teams, grid} ->
+      {positions, grid} = split_random_n(grid, nb_members)
+      {Map.put(teams, team, Map.keys(positions)), grid}
+    end)
+    teams
+  end
+
+  def mutate_individual(_) do
+    %{}
+  end
+
+  def breed_individuals(_, _) do
+    {%{}, %{}}
   end
 end
