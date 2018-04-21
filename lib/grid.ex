@@ -33,29 +33,13 @@ defmodule Grid do
       |> Grid.empty_grids()
       |> Enum.max_by(&Enum.count/1)
 
-    if map_size(placement_grid) < (8) do
+    nb_participants = teams |> Map.values() |> Enum.sum()
+    if map_size(placement_grid) < nb_participants do
       raise "Not enough free space to place participants"
     end
 
-    average_dim = Enum.sum(dimensions) / Enum.count(dimensions)
     max_tries = 500
-
-    placement =
-      fn ->
-        generate_individual(teams, placement_grid)
-      end
-      |> Stream.repeatedly()
-      |> Enum.reduce_while({max_tries, average_dim}, fn x, {tries, average_dim} ->
-        if evaluate_fitness(x) >= average_dim do
-          {:halt, x}
-        else
-          if tries == 0 do
-            {:cont, {max_tries, average_dim - 1}}
-          else
-            {:cont, {tries - 1, average_dim}}
-          end
-        end
-      end)
+    placement = place_participants(placement_grid, teams, dimensions, max_tries)
 
     grid =
       placement
@@ -79,8 +63,24 @@ defmodule Grid do
     |> Enum.into(%{})
   end
 
-  def place_participants(_grid, _participants) do
-    %{}
+  def place_participants(grid, teams, dimensions, max_tries) do
+    average_dim = Enum.sum(dimensions) / Enum.count(dimensions)
+
+    fn ->
+      generate_individual(teams, grid)
+    end
+    |> Stream.repeatedly()
+    |> Enum.reduce_while({max_tries, average_dim}, fn x, {tries, average_dim} ->
+      if evaluate_fitness(x) >= average_dim do
+        {:halt, x}
+      else
+        if tries == 0 do
+          {:cont, {max_tries, average_dim - 1}}
+        else
+          {:cont, {tries - 1, average_dim}}
+        end
+      end
+    end)
   end
 
   @spec get_adjacent_cells(coordinates, grid) :: grid
