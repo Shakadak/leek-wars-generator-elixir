@@ -133,7 +133,7 @@ defmodule Grid do
   def empty?({_, _}) do false end
 
   defp fst({x, _}) do x end
-  defp snd({_, x}) do x end
+  # defp snd({_, x}) do x end
 
   defp liftA2(f, xs, ys) when is_function(f, 2) do
     for x <- xs, y <- ys do f.(x, y) end
