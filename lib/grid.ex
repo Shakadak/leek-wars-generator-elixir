@@ -20,7 +20,8 @@ defmodule Grid do
         ) :: {grid, %{any => [coordinates]}}
   def generate(type, dimensions, obstacles, teams) do
     grid = apply(Grid, type, dimensions)
-      |> Grid.generate_count(obstacles)
+      |> generate_count(obstacles)
+      |> redimension_obstacles(:square, 2, trunc(obstacles / 2))
 
     placement_grid =
       grid
@@ -86,6 +87,36 @@ defmodule Grid do
     grid
   end
 
+  def redimension_obstacle(grid, {x, y}, :square, size) do
+    cells =
+      grid
+      |> Map.take(for x <- x..(x + size - 1), y <- y..(y + size - 1) do {x, y} end)
+      |> Enum.filter(&empty?/1)
+
+    if Enum.count(cells) < (size * size - 1) do
+      :error
+    else
+      cells
+      |> Enum.map(fn {x, _} -> {x, :obstacle} end)
+      |> Enum.into(grid)
+      |> ok()
+    end
+  end
+
+  def redimension_obstacles(grid, shape, size, count) do
+    grid
+    |> Enum.filter(&obstacle?/1)
+    |> Enum.map(&fst/1)
+    |> Enum.shuffle()
+    |> Enum.reduce_while({grid, 0}, fn
+      _, {grid, ^count} -> {:halt, grid}
+      cell, {grid, count} -> case redimension_obstacle(grid, cell, shape, size) do
+        {:ok, grid} -> {:cont, {grid, count + 1}}
+        :error -> {:cont, {grid, count}}
+      end
+    end)
+  end
+
   def place_participants(_grid, _participants) do
     %{}
   end
@@ -140,8 +171,13 @@ defmodule Grid do
   def empty?({_, :empty}) do true end
   def empty?({_, _}) do false end
 
+  def obstacle?({_, :obstacle}) do true end
+  def obstacle?({_, _}) do false end
+
   defp fst({x, _}) do x end
   # defp snd({_, x}) do x end
+  
+  defp ok(x) do {:ok, x} end
 
   defp liftA2(f, xs, ys) when is_function(f, 2) do
     for x <- xs, y <- ys do f.(x, y) end
