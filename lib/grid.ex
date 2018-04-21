@@ -109,12 +109,13 @@ defmodule Grid do
     |> Enum.map(&fst/1)
     |> Enum.shuffle()
     |> Enum.reduce_while({grid, 0}, fn
-      _, {grid, ^count} -> {:halt, grid}
+      _, {grid, ^count} -> {:halt, {grid, count}}
       cell, {grid, count} -> case redimension_obstacle(grid, cell, shape, size) do
         {:ok, grid} -> {:cont, {grid, count + 1}}
         :error -> {:cont, {grid, count}}
       end
     end)
+    |> elem(0)
   end
 
   def place_participants(_grid, _participants) do
