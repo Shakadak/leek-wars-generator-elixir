@@ -190,4 +190,19 @@ defmodule Grid do
   def breed_individuals(_, _) do
     {%{}, %{}}
   end
+
+  def print(grid, :disk, [radius]) do
+    for x <- -radius..radius do
+      for y <- -radius..radius do
+        case grid[{x, y}] do
+          nil -> "  "
+          :empty -> "░░"
+          :obstacle -> "▓▓"
+          :occupied -> "[]"
+        end
+        |> IO.write()
+      end
+      IO.write("\n")
+    end
+  end
 end
