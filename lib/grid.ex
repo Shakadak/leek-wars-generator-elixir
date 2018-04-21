@@ -10,6 +10,9 @@ defmodule Grid do
   @type grid :: %{{integer, integer} => :empty | :obstacle | :occupied}
   @type coordinates :: {integer, integer}
 
+  @doc ~S"""
+  Example usage `Grid.generate(:disk, [17], 30, %{1 => 4, 2 => 4})`
+  """
   @spec generate(
         :disk, [non_neg_integer],
         non_neg_integer,
