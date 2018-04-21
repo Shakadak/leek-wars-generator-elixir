@@ -10,6 +10,49 @@ defmodule Grid do
   @type grid :: %{{integer, integer} => :empty | :obstacle | :occupied}
   @type coordinates :: {integer, integer}
 
+  @spec generate(
+        :disk, [non_neg_integer],
+        non_neg_integer,
+        %{any => pos_integer}
+        ) :: {grid, %{any => [coordinates]}}
+  def generate(type, dimensions, obstacles, teams) do
+    grid = apply(Grid, type, dimensions)
+      |> Grid.generate_count(obstacles)
+
+    placement_grid =
+      grid
+      |> Grid.empty_grids()
+      |> Enum.max_by(&Enum.count/1)
+
+    if map_size(placement_grid) < (8) do
+      raise "Not enough free space to place participants"
+    end
+
+    average_dim = Enum.sum(dimensions) / Enum.count(dimensions)
+
+    placement =
+      fn ->
+        generate_individual(teams, placement_grid)
+      end
+      |> Stream.repeatedly()
+      |> Enum.reduce_while(nil, fn x, _ ->
+        if evaluate_fitness(x) >= average_dim do
+          {:halt, x}
+        else
+          {:cont, nil}
+        end
+      end)
+
+    grid =
+      placement
+      |> Map.values()
+      |> Enum.concat()
+      |> Enum.map(fn x -> {x, :occupied} end)
+      |> Enum.into(grid)
+
+    {grid, placement}
+  end
+
   @spec disk(pos_integer) :: grid
   def disk(radius) do
     mkPair = fn x, y -> {x, y} end
@@ -117,7 +160,8 @@ defmodule Grid do
       other_positions =
         teams
         |> Map.delete(team)
-        |> Enum.flat_map(&snd/1)
+        |> Map.values()
+        |> Enum.concat()
       liftA2(&manhattan/2, positions, other_positions)
     end)
     |> Enum.min()
