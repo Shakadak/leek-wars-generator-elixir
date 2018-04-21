@@ -12,13 +12,11 @@ defmodule Grid do
 
   @spec disk(pos_integer) :: grid
   def disk(radius) do
-    mkPair = fn x -> fn y -> {x, y} end end
+    mkPair = fn x, y -> {x, y} end
     xs = -radius..radius
     ys = xs
 
-    xs
-    |> Enum.map(mkPair)
-    |> Enum.flat_map(fn f -> Enum.map(ys, f) end)
+    liftA2(mkPair, xs, ys)
     |> Enum.filter(fn {x, y} -> (abs(x) + abs (y)) <= radius end)
     |> Enum.map(fn x -> {x, :empty} end)
     |> Enum.into(%{})
@@ -87,4 +85,29 @@ defmodule Grid do
   def empty?({_, _}) do false end
 
   defp fst({x, _}) do x end
+
+  defp liftA2(f, xs, ys) do
+    for x <- xs, y <- ys do f.(x, y) end
+  end
+
+  defp manhattan(x, y) do
+    [x, y]
+    |> Enum.map(&Tuple.to_list/1)
+    |> Enum.zip()
+    |> Enum.map(fn {p, q} -> abs(p - q) end)
+    |> Enum.sum()
+  end
+
+  #defp evaluate_fitness(teams) do
+  #  teams
+  #  |> Enum.flat_map(fn {team, members} ->
+  #    other_teams = Map.delete(teams, team)
+  #    other_members = Enum.flat_map(other_teams, fn {_, xs} -> xs end)
+  #    members
+  #    |> Enum.flat_map(fn x ->
+  #end
+
+  defp _ do
+    0
+  end
 end
