@@ -7,8 +7,13 @@ defmodule Grid do
   :rand.seed(:exsplus, seed)
   """
 
+  import Util
+
+  alias Grid.Obstacle
+
   @type grid :: %{{integer, integer} => :empty | :obstacle | :occupied}
   @type coordinates :: {integer, integer}
+  @type t :: grid
 
   @doc ~S"""
   Example usage `Grid.generate(:disk, [17], 30, %{1 => 4, 2 => 4})`
@@ -20,8 +25,8 @@ defmodule Grid do
         ) :: {grid, %{any => [coordinates]}}
   def generate(type, dimensions, obstacles, teams) do
     grid = apply(Grid, type, dimensions)
-      |> generate_count(obstacles)
-      |> redimension_obstacles(:square, 2, trunc(obstacles / 2))
+      |> Obstacle.generate(:count, obstacles)
+      |> Obstacle.redimension(:square, 2, trunc(obstacles / 2))
 
     placement_grid =
       grid
@@ -72,50 +77,6 @@ defmodule Grid do
     |> Enum.filter(fn {x, y} -> (abs(x) + abs (y)) <= radius end)
     |> Enum.map(fn x -> {x, :empty} end)
     |> Enum.into(%{})
-  end
-
-  @spec generate_count(grid, non_neg_integer) :: grid
-  def generate_count(grid, count) do
-    grid
-    |> Map.keys()
-    |> Enum.take_random(count)
-    |> Enum.map(fn x -> {x, :obstacle} end)
-    |> Enum.into(grid)
-  end
-
-  def generate_density(grid, _density) do
-    grid
-  end
-
-  def redimension_obstacle(grid, {x, y}, :square, size) do
-    cells =
-      grid
-      |> Map.take(for x <- x..(x + size - 1), y <- y..(y + size - 1) do {x, y} end)
-      |> Enum.filter(&empty?/1)
-
-    if Enum.count(cells) < (size * size - 1) do
-      :error
-    else
-      cells
-      |> Enum.map(fn {x, _} -> {x, :obstacle} end)
-      |> Enum.into(grid)
-      |> ok()
-    end
-  end
-
-  def redimension_obstacles(grid, shape, size, count) do
-    grid
-    |> Enum.filter(&obstacle?/1)
-    |> Enum.map(&fst/1)
-    |> Enum.shuffle()
-    |> Enum.reduce_while({grid, 0}, fn
-      _, {grid, ^count} -> {:halt, {grid, count}}
-      cell, {grid, count} -> case redimension_obstacle(grid, cell, shape, size) do
-        {:ok, grid} -> {:cont, {grid, count + 1}}
-        :error -> {:cont, {grid, count}}
-      end
-    end)
-    |> elem(0)
   end
 
   def place_participants(_grid, _participants) do
@@ -174,15 +135,6 @@ defmodule Grid do
 
   def obstacle?({_, :obstacle}) do true end
   def obstacle?({_, _}) do false end
-
-  defp fst({x, _}) do x end
-  # defp snd({_, x}) do x end
-  
-  defp ok(x) do {:ok, x} end
-
-  defp liftA2(f, xs, ys) when is_function(f, 2) do
-    for x <- xs, y <- ys do f.(x, y) end
-  end
 
   defp split_random_n(map, n) do
     keys =
