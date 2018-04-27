@@ -1,8 +1,4 @@
-defmodule LeekWarsFightGeneratorTest do
+defmodule LeekWarsGeneratorTest do
   use ExUnit.Case
-  doctest LeekWarsFightGenerator
-
-  test "greets the world" do
-    assert LeekWarsFightGenerator.hello() == :world
-  end
+  doctest LeekWarsGenerator
 end
