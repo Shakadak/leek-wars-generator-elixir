@@ -67,7 +67,7 @@ defmodule Item do
       area_type: String.to_existing_atom(area_type),
       need_los?: need_los,
       revive?: is_revive,
-      effects: effects,
+      effects: Enum.map(effects, &Effect.Item.new/1),
     }
   end
 end
