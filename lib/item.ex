@@ -26,6 +26,8 @@ defmodule Item do
     effects: [],
   ]
 
+  @area_types [:point, :laser, :circle_1, :circle_2, :circle_3]
+
   def new(%{
       "initial_cooldown" => initial_cooldown,
       "cooldown" => cooldown,
@@ -53,7 +55,8 @@ defmodule Item do
     and is_boolean(is_revive)
     and is_list(effects)
   do
-    %Item{
+    _ = @area_types
+    %__MODULE__{
       current_cooldown: initial_cooldown,
       cooldown_time: cooldown,
       need_equipping?: need_equipping,
@@ -61,16 +64,10 @@ defmodule Item do
       use_cost: use_cost,
       reach: {min_range, max_range},
       inline?: is_inline,
-      area_type: area_type(area_type),
+      area_type: String.to_existing_atom(area_type),
       need_los?: need_los,
       revive?: is_revive,
       effects: effects,
     }
   end
-
-  def area_type("AREA_POINT") do :point end
-  def area_type("AREA_LASER_LINE") do :laser end
-  def area_type("AREA_CIRCLE_1") do :circle_1 end
-  def area_type("AREA_CIRCLE_2") do :circle_2 end
-  def area_type("AREA_CIRCLE_3") do :circle_3 end
 end

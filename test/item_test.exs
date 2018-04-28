@@ -11,7 +11,7 @@ defmodule ItemTest do
       "min_range" => 1,
       "max_range" => 7,
       "is_inline" => false,
-      "area_type" => "AREA_POINT",
+      "area_type" => "point",
       "need_los" => true,
       "is_revive" => false,
       "effects" => [],
