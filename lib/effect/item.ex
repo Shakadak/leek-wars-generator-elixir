@@ -53,7 +53,7 @@ defmodule Effect.Item do
   when is_binary(type)
     and is_integer(min_roll)
     and is_integer(max_roll)
-    and is_integer(duration) and duration >= 0
+    and (duration == "immediate" or is_integer(duration) and duration >= 0)
     and is_map(target_type)
     and (is_integer(max_stack) or max_stack == "infinity")
   do
@@ -61,7 +61,7 @@ defmodule Effect.Item do
     %__MODULE__{
       type: String.to_existing_atom(type),
       rolls: {min_roll, max_roll},
-      duration: duration,
+      duration: if duration == "immediate" do :immediate else duration end,
       target_type: target_type(target_type),
       max_stack: if max_stack == "infinity" do :infinity else max_stack end,
     }

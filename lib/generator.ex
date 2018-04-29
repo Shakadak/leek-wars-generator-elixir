@@ -8,15 +8,15 @@ defmodule Generator do
 
   # IMPL
 
-  def start_link() do
-    GenServer.start_link(__MODULE__, {}, name: __MODULE__)
+  def start_link(setup_file, environment_file, output_file) do
+    GenServer.start_link(__MODULE__, {setup_file, environment_file, output_file}, name: __MODULE__)
   end
 
-  def init({}) do
-    [setup_file, environment_file, output_file] = IO.inspect(System.argv())
+  def init({setup_file, environment_file, output_file}) do
+    #[setup_file, environment_file, output_file] = IO.inspect(System.argv())
     %{
       "type" => "setup",
-      "data" => _setup
+      "data" => setup
     } =
       setup_file
       |> File.read!()
@@ -37,6 +37,12 @@ defmodule Generator do
       output_file
       |> File.read!()
       |> Poison.decode!()
+
+    :rand.seed(:exsplus, setup["seed"] |> List.to_tuple())
+
+    grid_setup = setup["grid"]
+    team_counts = setup["teams"] |> Enum.reduce(%{}, fn x, acc -> Map.put(acc, Enum.count(acc) + 1, Enum.count(x)) end)
+    {_grid, _placement} = Grid.generate(String.to_existing_atom(grid_setup["type"]), grid_setup["dimensions"], grid_setup["obstacles"], team_counts)
 
   end
 end

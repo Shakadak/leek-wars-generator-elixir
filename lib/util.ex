@@ -13,4 +13,8 @@ defmodule Util do
   end
 
   def tuple2(x, y) do {x, y} end
+
+  def transpose([])             do [] end
+  def transpose([[] | xss])     do transpose(xss) end
+  def transpose([[x|xs] | xss]) do [[x | for [h|_] <- xss do h end] | transpose([xs | for [_|t] <- xss do t end])] end
 end

@@ -1,6 +1,8 @@
 defmodule Entity do
   defstruct [
+    type: :leek,
     id: nil,
+    team: nil,
     level: 0,
     mp: 0,
     tp: 0,
@@ -16,6 +18,12 @@ defmodule Entity do
     alive?: false,
     items: [],
   ]
+
+  def new(%{}, _team, type \\ :leek) do
+    %__MODULE__{
+      type: type,
+    }
+  end
 
   def refresh_cooldowns(items) do
     items

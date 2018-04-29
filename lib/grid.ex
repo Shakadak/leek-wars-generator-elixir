@@ -70,15 +70,15 @@ defmodule Grid do
       generate_individual(teams, grid)
     end
     |> Stream.repeatedly()
-    |> Enum.reduce_while({max_tries, average_dim}, fn x, {tries, average_dim} ->
-      if evaluate_fitness(x) >= average_dim do
-        {:halt, x}
-      else
-        if tries == 0 do
-          {:cont, {max_tries, average_dim - 1}}
-        else
-          {:cont, {tries - 1, average_dim}}
-        end
+    |> Enum.reduce_while({max_tries, average_dim, {-1, %{}}}, fn x, {tries, average_dim, historical_best} ->
+      {fit, best} = current_best = Enum.max_by([historical_best, {evaluate_fitness(x), x}], fn {y, _} -> y end)
+      cond do
+        fit >= average_dim ->
+          {:halt, best}
+        tries == 0 ->
+          {:cont, {max_tries, average_dim - 1, current_best}}
+        true ->
+          {:cont, {tries - 1, average_dim, current_best}}
       end
     end)
   end
