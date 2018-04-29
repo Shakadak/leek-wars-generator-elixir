@@ -1,44 +1,48 @@
 {
-    "seed": [7,7,7],
-    "grid": {
-        "type": "disk",
-        "dimensions": [17],
-        "obstacles": 30
-    },
-    "teams": [
-        [
-            {
-                "name": "Cerveaumort",
-                "level": 1,
-                "mp": 3,
-                "tp": 10,
-                "strength": 100,
-                "magic": 0,
-                "wisdom": 0,
-                "resistance": 0,
-                "science": 0,
-                "malice": 0,
-                "agility": 0,
-                "max_life": 0,
-                "items": ["pistol"]
-            }
-        ],
-        [
-            {
-                "name": "Braindead",
-                "level": 1,
-                "mp": 3,
-                "tp": 10,
-                "strength": 100,
-                "magic": 0,
-                "wisdom": 0,
-                "resistance": 0,
-                "science": 0,
-                "malice": 0,
-                "agility": 0,
-                "max_life": 0,
-                "items": ["pistol"]
-            }
+    "type": "setup",
+    "version": 1,
+    "data": {
+        "seed": [7,7,7],
+        "grid": {
+            "type": "disk",
+            "dimensions": [17],
+            "obstacles": 30
+        },
+        "teams": [
+            [
+                {
+                    "name": "Cerveaumort",
+                    "level": 1,
+                    "mp": 3,
+                    "tp": 10,
+                    "strength": 100,
+                    "magic": 0,
+                    "wisdom": 0,
+                    "resistance": 0,
+                    "science": 0,
+                    "malice": 0,
+                    "agility": 0,
+                    "max_life": 0,
+                    "items": ["pistol"]
+                }
+            ],
+            [
+                {
+                    "name": "Braindead",
+                    "level": 1,
+                    "mp": 3,
+                    "tp": 10,
+                    "strength": 100,
+                    "magic": 0,
+                    "wisdom": 0,
+                    "resistance": 0,
+                    "science": 0,
+                    "malice": 0,
+                    "agility": 0,
+                    "max_life": 0,
+                    "items": ["pistol"]
+                }
+            ]
         ]
-    ]
+    }
 }

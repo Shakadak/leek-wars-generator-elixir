@@ -6,7 +6,7 @@ defmodule Effect.ItemTest do
     "type" => "damage",
     "min_roll" => 15,
     "max_roll" => 20,
-    "duration" => 0,
+    "duration" => "immediate",
     "target_type" => %{
       "enemies" => true,
       "allies" => true,
@@ -18,7 +18,7 @@ defmodule Effect.ItemTest do
   }) == %Effect.Item{
       type: :damage,
       rolls: {15, 20},
-      duration: 0,
+      duration: :immediate,
       target_type: %{
       enemies: true,
       allies: true,
