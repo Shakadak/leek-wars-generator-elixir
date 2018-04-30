@@ -35,19 +35,19 @@ defmodule Util do
   end
 
   def transpose([[x | xs] | xss]) do
-    [
-      [
-        x
-        | for [h | _] <- xss do
-            h
-          end
-      ]
-      | transpose([
-          xs
-          | for [_ | t] <- xss do
-              t
-            end
-        ])
-    ]
+    head =
+      for [h | _] <- xss do
+        h
+      end
+      |> Enum.into([x])
+
+    tail =
+      for [_ | t] <- xss do
+        t
+      end
+      |> Enum.into([xs])
+      |> transpose()
+
+    [head | tail]
   end
 end
