@@ -26,7 +26,7 @@ defmodule Item do
     effects: [],
   ]
 
-  @area_types [:point, :laser, :circle_1, :circle_2, :circle_3]
+  @area_types [:point, :laser, :circle_1, :disk_2, :disk_3]
 
   def new(%{
       "initial_cooldown" => initial_cooldown,

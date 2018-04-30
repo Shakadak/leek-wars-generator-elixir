@@ -12,6 +12,7 @@
             [
                 {
                     "name": "Cerveaumort",
+                    "frequency": 100,
                     "level": 1,
                     "mp": 3,
                     "tp": 10,
@@ -29,6 +30,7 @@
             [
                 {
                     "name": "Braindead",
+                    "frequency": 100,
                     "level": 1,
                     "mp": 3,
                     "tp": 10,

@@ -55,7 +55,7 @@ defmodule Effect.Item do
     and is_integer(max_roll)
     and (duration == "immediate" or is_integer(duration) and duration >= 0)
     and is_map(target_type)
-    and (is_integer(max_stack) or max_stack == "infinity")
+    and (is_integer(max_stack) and max_stack >= 0 or max_stack == "infinity")
   do
     _ = @effect_types
     %__MODULE__{
