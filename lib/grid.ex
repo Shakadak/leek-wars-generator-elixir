@@ -18,13 +18,11 @@ defmodule Grid do
   @doc ~S"""
   Example usage `Grid.generate(:disk, [17], 30, %{1 => 4, 2 => 4})`
   """
-  @spec generate(
-        :disk, [non_neg_integer],
-        non_neg_integer,
-        %{any => pos_integer}
-        ) :: {grid, %{any => [coordinates]}}
+  @spec generate(:disk, [non_neg_integer], non_neg_integer, %{any => pos_integer}) ::
+          {grid, %{any => [coordinates]}}
   def generate(type, dimensions, obstacles, teams) do
-    grid = apply(Grid, type, dimensions)
+    grid =
+      apply(Grid, type, dimensions)
       |> Obstacle.generate(:count, obstacles)
       |> Obstacle.redimension(:square, 2, trunc(obstacles / 2))
 
@@ -34,6 +32,7 @@ defmodule Grid do
       |> Enum.max_by(&Enum.count/1)
 
     nb_participants = teams |> Map.values() |> Enum.sum()
+
     if map_size(placement_grid) < nb_participants do
       raise "Not enough free space to place participants"
     end
@@ -58,7 +57,7 @@ defmodule Grid do
     ys = xs
 
     liftA2(mkPair, xs, ys)
-    |> Enum.filter(fn {x, y} -> (abs(x) + abs (y)) <= radius end)
+    |> Enum.filter(fn {x, y} -> abs(x) + abs(y) <= radius end)
     |> Enum.map(fn x -> {x, :empty} end)
     |> Enum.into(%{})
   end
@@ -70,13 +69,20 @@ defmodule Grid do
       generate_individual(teams, grid)
     end
     |> Stream.repeatedly()
-    |> Enum.reduce_while({max_tries, average_dim, {-1, %{}}}, fn x, {tries, average_dim, historical_best} ->
-      {fit, best} = current_best = Enum.max_by([historical_best, {evaluate_fitness(x), x}], fn {y, _} -> y end)
+    |> Enum.reduce_while({max_tries, average_dim, {-1, %{}}}, fn x,
+                                                                 {tries, average_dim,
+                                                                  historical_best} ->
+      {fit, best} =
+        current_best =
+        Enum.max_by([historical_best, {evaluate_fitness(x), x}], fn {y, _} -> y end)
+
       cond do
         fit >= average_dim ->
           {:halt, best}
+
         tries == 0 ->
           {:cont, {max_tries, average_dim - 1, current_best}}
+
         true ->
           {:cont, {tries - 1, average_dim, current_best}}
       end
@@ -90,7 +96,7 @@ defmodule Grid do
       {x - 1, y},
       {x + 1, y},
       {x, y - 1},
-      {x, y + 1},
+      {x, y + 1}
     ])
   end
 
@@ -102,8 +108,10 @@ defmodule Grid do
   defp empty_grid_go([], _, acc) do
     acc
   end
+
   defp empty_grid_go(starting_cells, grid, acc) do
     {current_area, grid} = Map.split(grid, starting_cells)
+
     wave =
       starting_cells
       |> Enum.flat_map(fn x -> get_adjacent_cells(x, grid) end)
@@ -130,11 +138,21 @@ defmodule Grid do
     end
   end
 
-  def empty?({_, :empty}) do true end
-  def empty?({_, _}) do false end
+  def empty?({_, :empty}) do
+    true
+  end
 
-  def obstacle?({_, :obstacle}) do true end
-  def obstacle?({_, _}) do false end
+  def empty?({_, _}) do
+    false
+  end
+
+  def obstacle?({_, :obstacle}) do
+    true
+  end
+
+  def obstacle?({_, _}) do
+    false
+  end
 
   defp split_random_n(map, n) do
     keys =
@@ -159,16 +177,19 @@ defmodule Grid do
         |> Map.delete(team)
         |> Map.values()
         |> Enum.concat()
+
       liftA2(&manhattan/2, positions, other_positions)
     end)
     |> Enum.min()
   end
 
   def generate_individual(teams, grid) do
-    {teams, _} = Enum.reduce(teams, {%{}, grid}, fn {team, nb_members}, {teams, grid} ->
-      {positions, grid} = split_random_n(grid, nb_members)
-      {Map.put(teams, team, Map.keys(positions)), grid}
-    end)
+    {teams, _} =
+      Enum.reduce(teams, {%{}, grid}, fn {team, nb_members}, {teams, grid} ->
+        {positions, grid} = split_random_n(grid, nb_members)
+        {Map.put(teams, team, Map.keys(positions)), grid}
+      end)
+
     teams
   end
 

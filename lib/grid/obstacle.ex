@@ -5,7 +5,7 @@ defmodule Grid.Obstacle do
 
   import Util
 
-  @spec generate(Grid.t, :count, non_neg_integer) :: Grid.t
+  @spec generate(Grid.t(), :count, non_neg_integer) :: Grid.t()
   def generate(grid, :count, count) do
     grid
     |> Map.keys()
@@ -20,13 +20,14 @@ defmodule Grid.Obstacle do
 
   def redimension_obstacle(grid, {x, y}, :square, size) do
     surface = liftA2(&{&1, &2}, range_slice(x, size), range_slice(y, size))
+
     cells =
       grid
-      #|> Map.take(for x <- x..(x + size - 1), y <- y..(y + size - 1) do {x, y} end)
+      # |> Map.take(for x <- x..(x + size - 1), y <- y..(y + size - 1) do {x, y} end)
       |> Map.take(surface)
       |> Enum.filter(&Grid.empty?/1)
 
-    if Enum.count(cells) < (size * size - 1) do
+    if Enum.count(cells) < size * size - 1 do
       :error
     else
       cells
@@ -42,14 +43,19 @@ defmodule Grid.Obstacle do
     |> Enum.map(&fst/1)
     |> Enum.shuffle()
     |> Enum.reduce_while({grid, 0}, fn
-      _, {grid, ^count} -> {:halt, {grid, count}}
-      cell, {grid, count} -> case redimension_obstacle(grid, cell, shape, size) do
-        {:ok, grid} -> {:cont, {grid, count + 1}}
-        :error -> {:cont, {grid, count}}
-      end
+      _, {grid, ^count} ->
+        {:halt, {grid, count}}
+
+      cell, {grid, count} ->
+        case redimension_obstacle(grid, cell, shape, size) do
+          {:ok, grid} -> {:cont, {grid, count + 1}}
+          :error -> {:cont, {grid, count}}
+        end
     end)
     |> elem(0)
   end
 
-  def range_slice(x, len) do Range.new(x, x + len - 1) end
+  def range_slice(x, len) do
+    Range.new(x, x + len - 1)
+  end
 end

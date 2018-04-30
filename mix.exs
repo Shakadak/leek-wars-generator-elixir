@@ -8,7 +8,7 @@ defmodule LeekWarsFightGenerator.MixProject do
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      elixirc_options: [warnings_as_errors: true],
+      elixirc_options: [warnings_as_errors: true]
     ]
   end
 
@@ -17,10 +17,10 @@ defmodule LeekWarsFightGenerator.MixProject do
     [
       applications: [
         :cowboy,
-        :plug,
+        :plug
       ],
       extra_applications: [:logger],
-      mod: {LeekWarsGenerator, []},
+      mod: {LeekWarsGenerator, []}
     ]
   end
 
@@ -29,7 +29,7 @@ defmodule LeekWarsFightGenerator.MixProject do
     [
       {:cowboy, "~> 1.1"},
       {:plug, "~> 1.5"},
-      {:poison, "~> 3.1"},
+      {:poison, "~> 3.1"}
     ]
   end
 end
