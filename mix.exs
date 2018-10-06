@@ -17,7 +17,8 @@ defmodule LeekWarsFightGenerator.MixProject do
     [
       applications: [
         :cowboy,
-        :plug
+        :plug,
+        :poison,
       ],
       extra_applications: [:logger],
       mod: {LeekWarsGenerator, []}
@@ -27,9 +28,9 @@ defmodule LeekWarsFightGenerator.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:cowboy, "~> 1.1"},
-      {:plug, "~> 1.5"},
-      {:poison, "~> 3.1"}
+      {:cowboy, "~> 2.5"},
+      {:plug, "~> 1.6"},
+      {:poison, "~> 4.0"}
     ]
   end
 end

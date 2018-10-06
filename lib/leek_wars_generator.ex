@@ -5,7 +5,7 @@ defmodule LeekWarsGenerator do
 
   def start(_, _) do
     children = [
-      Plug.Adapters.Cowboy.child_spec(
+      Plug.Adapters.Cowboy2.child_spec(
         scheme: :http,
         plug: LeekWarsGenerator.Api.Router,
         options: [port: 4001]
