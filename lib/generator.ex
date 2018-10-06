@@ -16,6 +16,7 @@ defmodule Generator do
     )
   end
 
+  @impl true
   def init({setup_file, environment_file, output_file}) do
     # [setup_file, environment_file, output_file] = IO.inspect(System.argv())
     %{
@@ -48,7 +49,8 @@ defmodule Generator do
 
     team_counts =
       setup["teams"]
-      |> Enum.reduce(%{}, fn x, acc -> Map.put(acc, Enum.count(acc) + 1, Enum.count(x)) end)
+      |> Enum.with_index(1)
+      |> Enum.into(%{}, fn {vs, k} -> {k, Enum.count(vs)} end)
 
     {_grid, _placement} =
       Grid.generate(
